@@ -1,0 +1,211 @@
+/* ============================================================
+   Kasir Swalayan — style.css (JavaFX CSS, tanpa FXML)
+   ============================================================ */
+
+/* ── Warna utama ──────────────────────────────────────────── */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-font-size: 13px;
+    -fx-background-color: #f0f2f5;
+}
+
+/* ── TOP BAR ─────────────────────────────────────────────── */
+.topbar {
+    -fx-background-color: #1a73e8;
+    -fx-padding: 10 16;
+    -fx-spacing: 8;
+}
+.topbar-label {
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+}
+
+/* ── SIDEBAR ─────────────────────────────────────────────── */
+.sidebar {
+    -fx-background-color: #202c3e;
+    -fx-padding: 16 10;
+    -fx-pref-width: 180px;
+    -fx-min-width: 160px;
+    -fx-spacing: 4;
+}
+.sidebar-header {
+    -fx-text-fill: #7b8fa6;
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-padding: 0 0 8 4;
+}
+.sidebar-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #c8d6e5;
+    -fx-alignment: CENTER-LEFT;
+    -fx-padding: 9 12;
+    -fx-font-size: 13px;
+    -fx-cursor: hand;
+    -fx-background-radius: 6;
+}
+.sidebar-btn:hover {
+    -fx-background-color: #2d3f55;
+    -fx-text-fill: white;
+}
+
+/* ── CONTENT AREA ────────────────────────────────────────── */
+.content-area {
+    -fx-padding: 0;
+    -fx-background-color: #f0f2f5;
+}
+.page-box {
+    -fx-padding: 20;
+    -fx-spacing: 10;
+    -fx-background-color: #f0f2f5;
+}
+.page-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202c3e;
+    -fx-padding: 0 0 6 0;
+}
+.field-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #5a6a7a;
+}
+
+/* ── INPUT FIELDS ────────────────────────────────────────── */
+.text-field, .password-field, .combo-box {
+    -fx-background-color: white;
+    -fx-border-color: #d0d7de;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 7 10;
+}
+.text-field:focused, .password-field:focused {
+    -fx-border-color: #1a73e8;
+}
+
+/* ── BUTTONS ─────────────────────────────────────────────── */
+.btn-primary {
+    -fx-background-color: #1a73e8;
+    -fx-text-fill: white;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+.btn-primary:hover { -fx-background-color: #1558b0; }
+
+.btn-danger {
+    -fx-background-color: #e53935;
+    -fx-text-fill: white;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+}
+.btn-danger:hover { -fx-background-color: #b71c1c; }
+
+.btn-secondary {
+    -fx-background-color: #78909c;
+    -fx-text-fill: white;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover { -fx-background-color: #546e7a; }
+
+.btn-success {
+    -fx-background-color: #2e7d32;
+    -fx-text-fill: white;
+    -fx-padding: 8 18;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+.btn-success:hover { -fx-background-color: #1b5e20; }
+
+/* ── TABLE VIEW ──────────────────────────────────────────── */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #d0d7de;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+}
+.table-view .column-header-background {
+    -fx-background-color: #202c3e;
+}
+.table-view .column-header .label {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+}
+.table-row-cell:odd  { -fx-background-color: #f8f9fa; }
+.table-row-cell:even { -fx-background-color: white; }
+.table-row-cell:selected {
+    -fx-background-color: #d2e3fc;
+    -fx-text-fill: #202c3e;
+}
+.table-row-cell:hover { -fx-background-color: #e8f0fe; }
+
+/* ── TRANSAKSI ───────────────────────────────────────────── */
+.trx-total {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a73e8;
+    -fx-padding: 4 8;
+    -fx-background-color: #e8f0fe;
+    -fx-background-radius: 5;
+}
+.trx-kembalian {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2e7d32;
+    -fx-padding: 4 8;
+    -fx-background-color: #e8f5e9;
+    -fx-background-radius: 5;
+}
+
+/* ── LOGIN ───────────────────────────────────────────────── */
+.login-root {
+    -fx-background-color: linear-gradient(to bottom right, #1a73e8, #0d47a1);
+}
+.login-card {
+    -fx-background-color: white;
+    -fx-padding: 32;
+    -fx-background-radius: 12;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 20, 0, 0, 6);
+}
+.login-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #202c3e;
+}
+.login-sub {
+    -fx-font-size: 13px;
+    -fx-text-fill: #78909c;
+    -fx-padding: 0 0 8 0;
+}
+.login-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #5a6a7a;
+    -fx-font-weight: bold;
+}
+.login-field {
+    -fx-pref-width: 300;
+    -fx-pref-height: 36;
+    -fx-background-color: white;
+    -fx-border-color: #d0d7de;
+    -fx-border-radius: 6;
+    -fx-background-radius: 6;
+    -fx-padding: 6 10;
+}
+.login-field:focused { -fx-border-color: #1a73e8; }
+.login-error {
+    -fx-text-fill: #e53935;
+    -fx-font-size: 12px;
+}
+
+/* ── SEPARATOR ───────────────────────────────────────────── */
+.separator *.line {
+    -fx-border-color: #d0d7de;
+    -fx-border-width: 1;
+}
