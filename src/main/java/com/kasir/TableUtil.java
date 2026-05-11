@@ -24,10 +24,8 @@ public class TableUtil {
 
         for (int i = 1; i <= colCount; i++) {
             final int idx = i - 1;
-            TableColumn<ObservableList<String>, String> col =
-                    new TableColumn<>(meta.getColumnLabel(i));
-            col.setCellValueFactory(data ->
-                    new SimpleStringProperty(data.getValue().get(idx)));
+            TableColumn<ObservableList<String>, String> col = new TableColumn<>(meta.getColumnLabel(i));
+            col.setCellValueFactory(data -> new SimpleStringProperty(data.getValue().get(idx)));
             col.setPrefWidth(130);
             table.getColumns().add(col);
         }

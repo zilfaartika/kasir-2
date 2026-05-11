@@ -23,15 +23,19 @@ public class MainView {
 
         Button btnLogout = new Button("Keluar");
         btnLogout.getStyleClass().add("btn-danger");
+
+        // [PERBAIKAN 1] Tambah konfirmasi sebelum logout
         btnLogout.setOnAction(e -> {
-            MainApp.loggedId = 0;
-            MainApp.loggedUser = "";
-            MainApp.loggedRole = "";
-            stage.setScene(new LoginView().build(stage));
-            stage.setResizable(false);
-            stage.setWidth(480);
-            stage.setHeight(380);
-            stage.centerOnScreen();
+            if (AlertUtil.confirm("Yakin ingin keluar dari aplikasi?")) {
+                MainApp.loggedId = 0;
+                MainApp.loggedUser = "";
+                MainApp.loggedRole = "";
+                stage.setScene(new LoginView().build(stage));
+                stage.setResizable(false);
+                stage.setWidth(480);
+                stage.setHeight(380);
+                stage.centerOnScreen();
+            }
         });
 
         HBox topBar = new HBox(lblWelcome, new Spacer(), btnLogout);
@@ -60,7 +64,6 @@ public class MainView {
         sidebar.getChildren().add(navBtn("🛒 Transaksi", e -> showTransaksi()));
         sidebar.getChildren().add(navBtn("📋 Riwayat", e -> showRiwayat()));
 
-        // Separator laporan
         Separator sep = new Separator();
         sep.setStyle("-fx-padding: 8 0;");
         Label lblLaporan = new Label("LAPORAN");
@@ -169,16 +172,42 @@ public class MainView {
         Button btnSimpan = new Button("💾 Simpan");
         btnSimpan.getStyleClass().add("btn-primary");
         btnSimpan.setOnAction(e -> {
+            // Validasi field teks wajib
             if (tfKode.getText().isEmpty() || tfNama.getText().isEmpty()) {
                 AlertUtil.warn("Kode dan Nama wajib diisi!");
                 return;
             }
+            // Validasi ComboBox
+            int idKat = parseId(cbKategori), idSup = parseId(cbSupplier);
+            if (idKat < 0 || idSup < 0) {
+                AlertUtil.warn("Pilih Kategori dan Supplier!");
+                return;
+            }
+            // [PERBAIKAN 2] Validasi format angka dengan pesan yang spesifik
+            double harga;
+            int stok;
+            try {
+                harga = Double.parseDouble(tfHarga.getText().trim());
+            } catch (NumberFormatException ex) {
+                AlertUtil.error("Format Salah", "Harga harus berupa angka!");
+                return;
+            }
+            try {
+                stok = Integer.parseInt(tfStok.getText().trim());
+            } catch (NumberFormatException ex) {
+                AlertUtil.error("Format Salah", "Stok harus berupa angka bulat!");
+                return;
+            }
+            // [PERBAIKAN 3] Validasi nilai tidak boleh negatif
+            if (harga < 0) {
+                AlertUtil.warn("Harga tidak boleh negatif!");
+                return;
+            }
+            if (stok < 0) {
+                AlertUtil.warn("Stok tidak boleh negatif!");
+                return;
+            }
             try (Connection c = DB.getConnection()) {
-                int idKat = parseId(cbKategori), idSup = parseId(cbSupplier);
-                if (idKat < 0 || idSup < 0) {
-                    AlertUtil.warn("Pilih Kategori dan Supplier!");
-                    return;
-                }
                 PreparedStatement ps = c.prepareStatement(
                         "INSERT INTO produk (id_kategori,id_supplier,kode_produk,nama_produk,harga,stok,satuan) " +
                                 "VALUES (?,?,?,?,?,?,?) " +
@@ -189,8 +218,8 @@ public class MainView {
                 ps.setInt(2, idSup);
                 ps.setString(3, tfKode.getText().trim());
                 ps.setString(4, tfNama.getText().trim());
-                ps.setDouble(5, Double.parseDouble(tfHarga.getText().trim()));
-                ps.setInt(6, Integer.parseInt(tfStok.getText().trim()));
+                ps.setDouble(5, harga);
+                ps.setInt(6, stok);
                 ps.setString(7, tfSatuan.getText().isEmpty() ? "pcs" : tfSatuan.getText().trim());
                 ps.executeUpdate();
                 clearAll(tfKode, tfNama, tfHarga, tfStok, tfSatuan);
@@ -208,7 +237,7 @@ public class MainView {
         btnHapus.setOnAction(e -> {
             ObservableList<String> sel = tbl.getSelectionModel().getSelectedItem();
             if (sel == null) {
-                AlertUtil.warn("Pilih produk!");
+                AlertUtil.warn("Pilih produk terlebih dahulu!");
                 return;
             }
             if (!AlertUtil.confirm("Hapus produk \"" + sel.get(1) + "\"?"))
@@ -382,7 +411,7 @@ public class MainView {
         btnSimpan.getStyleClass().add("btn-primary");
         btnSimpan.setOnAction(e -> {
             if (tfNama.getText().trim().isEmpty()) {
-                AlertUtil.warn("Nama wajib diisi!");
+                AlertUtil.warn("Nama supplier wajib diisi!");
                 return;
             }
             try (Connection c = DB.getConnection()) {
@@ -495,8 +524,10 @@ public class MainView {
         Button btnSimpan = new Button("💾 Simpan");
         btnSimpan.getStyleClass().add("btn-primary");
         btnSimpan.setOnAction(e -> {
-            String nama = tfNama.getText().trim(), uname = tfUsername.getText().trim(),
-                    pass = tfPassword.getText().trim(), role = cbRole.getValue();
+            String nama = tfNama.getText().trim();
+            String uname = tfUsername.getText().trim();
+            String pass = tfPassword.getText().trim();
+            String role = cbRole.getValue();
             if (nama.isEmpty() || uname.isEmpty() || role == null) {
                 AlertUtil.warn("Nama, Username, Role wajib diisi!");
                 return;
@@ -630,25 +661,47 @@ public class MainView {
         Button btnSimpan = new Button("💾 Simpan Stok");
         btnSimpan.getStyleClass().add("btn-primary");
         btnSimpan.setOnAction(e -> {
+            // Validasi ComboBox wajib
             int idProduk = parseId(cbProduk), idSup = parseId(cbSupplier);
             if (idProduk < 0 || idSup < 0) {
                 AlertUtil.warn("Pilih Produk dan Supplier!");
                 return;
             }
+            // Validasi tanggal
             String tgl = tfTanggal.getText().trim();
             if (tgl.isEmpty()) {
-                AlertUtil.warn("Tanggal wajib diisi!");
+                AlertUtil.warn("Tanggal wajib diisi! Format: YYYY-MM-DD");
+                return;
+            }
+            // [PERBAIKAN 4] Validasi format angka dengan pesan spesifik
+            int jml;
+            try {
+                jml = Integer.parseInt(tfJumlah.getText().trim());
+            } catch (NumberFormatException ex) {
+                AlertUtil.error("Format Salah", "Jumlah harus berupa angka bulat!");
+                return;
+            }
+            // [PERBAIKAN 5] Validasi jumlah harus lebih dari 0 (sesuai modul, hilang di
+            // kode asli)
+            if (jml <= 0) {
+                AlertUtil.warn("Jumlah harus lebih dari 0!");
+                return;
+            }
+            double hargaBeli;
+            try {
+                hargaBeli = Double.parseDouble(tfHargaBeli.getText().trim());
+            } catch (NumberFormatException ex) {
+                AlertUtil.error("Format Salah", "Harga Beli harus berupa angka!");
                 return;
             }
             try (Connection c = DB.getConnection()) {
-                int jml = Integer.parseInt(tfJumlah.getText().trim());
                 PreparedStatement ps = c.prepareStatement(
                         "INSERT INTO stok_masuk (id_produk,id_supplier,id_user,jumlah,harga_beli,tanggal,keterangan) VALUES (?,?,?,?,?,?,?)");
                 ps.setInt(1, idProduk);
                 ps.setInt(2, idSup);
                 ps.setInt(3, MainApp.loggedId);
                 ps.setInt(4, jml);
-                ps.setDouble(5, Double.parseDouble(tfHargaBeli.getText().trim()));
+                ps.setDouble(5, hargaBeli);
                 ps.setString(6, tgl);
                 ps.setString(7, tfKet.getText().trim());
                 ps.executeUpdate();
@@ -694,6 +747,7 @@ public class MainView {
         tfJumlah.setPromptText("Jumlah");
         TextField tfBayar = new TextField();
         tfBayar.setPromptText("Uang Bayar");
+
         Label lblTotal = new Label("Total: Rp 0");
         lblTotal.getStyleClass().add("trx-total");
         Label lblKembalian = new Label("Kembalian: Rp 0");
@@ -723,12 +777,17 @@ public class MainView {
             try {
                 jumlah = Integer.parseInt(tfJumlah.getText().trim());
             } catch (NumberFormatException ex) {
-                AlertUtil.warn("Jumlah harus angka!");
+                AlertUtil.warn("Jumlah harus berupa angka!");
+                return;
+            }
+            // [PERBAIKAN 6] Validasi jumlah minimal 1
+            if (jumlah <= 0) {
+                AlertUtil.warn("Jumlah harus lebih dari 0!");
                 return;
             }
             try (Connection c = DB.getConnection();
-                    PreparedStatement ps = c
-                            .prepareStatement("SELECT nama_produk, harga, stok FROM produk WHERE id_produk=?")) {
+                    PreparedStatement ps = c.prepareStatement(
+                            "SELECT nama_produk, harga, stok FROM produk WHERE id_produk=?")) {
                 ps.setInt(1, idProduk);
                 ResultSet rs = ps.executeQuery();
                 if (!rs.next())
@@ -791,7 +850,7 @@ public class MainView {
             } catch (Exception ignored) {
             }
             if ("tunai".equals(metode) && bayar < totalBelanja) {
-                AlertUtil.warn("Uang bayar kurang!");
+                AlertUtil.warn("Uang bayar kurang dari total belanja!");
                 return;
             }
             double kembalian = bayar - totalBelanja;
@@ -816,8 +875,8 @@ public class MainView {
                     int idTrx = keys.getInt(1);
 
                     for (ObservableList<String> row : keranjang) {
-                        PreparedStatement psId = c
-                                .prepareStatement("SELECT id_produk, harga FROM produk WHERE nama_produk=?");
+                        PreparedStatement psId = c.prepareStatement(
+                                "SELECT id_produk, harga FROM produk WHERE nama_produk=?");
                         psId.setString(1, row.get(0));
                         ResultSet rsId = psId.executeQuery();
                         rsId.next();
@@ -834,8 +893,8 @@ public class MainView {
                         psDet.setDouble(5, harga * jml);
                         psDet.executeUpdate();
 
-                        PreparedStatement psStok = c
-                                .prepareStatement("UPDATE produk SET stok=stok-? WHERE id_produk=?");
+                        PreparedStatement psStok = c.prepareStatement(
+                                "UPDATE produk SET stok=stok-? WHERE id_produk=?");
                         psStok.setInt(1, jml);
                         psStok.setInt(2, idProd);
                         psStok.executeUpdate();
@@ -924,7 +983,9 @@ public class MainView {
 
     private void loadCombo(ComboBox<String> cb, String sql) {
         cb.getItems().clear();
-        try (Connection c = DB.getConnection(); Statement s = c.createStatement(); ResultSet rs = s.executeQuery(sql)) {
+        try (Connection c = DB.getConnection();
+                Statement s = c.createStatement();
+                ResultSet rs = s.executeQuery(sql)) {
             while (rs.next())
                 cb.getItems().add(rs.getInt(1) + "|" + rs.getString(2));
         } catch (Exception e) {

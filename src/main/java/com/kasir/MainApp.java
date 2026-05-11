@@ -9,7 +9,7 @@ import javafx.stage.Stage;
 public class MainApp extends Application {
 
     // Session state (diisi saat login)
-    public static int    loggedId   = 0;
+    public static int loggedId = 0;
     public static String loggedUser = "";
     public static String loggedRole = "";
 
